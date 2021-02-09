@@ -20,11 +20,13 @@ bool isSystemTable(String table) {
 }
 
 String extractTableName(String sqlTableStatement) {
-  var parser = SqlParser(sqlTableStatement);
-  if (parser.parseTokens(['create', 'table'])) {
-    // optional
-    parser.parseTokens(['if', 'not', 'exists']);
-    return parser.getNextToken();
+  if (sqlTableStatement != null) {
+    var parser = SqlParser(sqlTableStatement);
+    if (parser.parseTokens(['create', 'table'])) {
+      // optional
+      parser.parseTokens(['if', 'not', 'exists']);
+      return parser.getNextToken();
+    }
   }
   return null;
 }
@@ -71,7 +73,7 @@ Future<List<String>> dbExportSql(Database db) async {
     for (var tableRow in tableRows) {
       var sql = tableRow.values.first as String;
       var table = extractTableName(sql);
-      if (table == null) {
+      if (table == null && sql != null) {
         // We know this is not a table
         statements.add(fixStatement(sql));
       }
